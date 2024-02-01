@@ -1,0 +1,45 @@
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "https://127.0.0.1:443/"
+            allowedHeaders:
+              - authorization
+              - content-type
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - OPTIONS
+              - DELETE
+      routes:
+        - id: accounts
+          uri: https://target-api-url.com
+          predicates:
+            - Path=/v1/sub-path/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin
+        - id: baselines
+          uri: https://target-api-url.com
+          predicates:
+            - Path=/v1/sub-path2/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin
+        - id: others
+          uri: https://target-api-url.com
+          predicates:
+            - Path=/v1/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin
+server:
+  ssl:
+    enabled: true
+    key-store: classpath:localhost-ssl.p12
+    key-store-type: pkcs12
+    key-store-password: 12345678
+
+logging:
+  level:
+    org.springframework.web: debug
